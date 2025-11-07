@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  django:
+    build: .
+    volumes:
+      - .:/scanner/docker  # Lier le répertoire local contenant ton projet au conteneur Django
+    ports:
+      - "8003:8000"
+    depends_on:
+      - clamav
+    environment:
+      - CLAMAV_HOST=clamav
+
+  clamav:
+    image: clamav/clamav:latest
+    container_name: clamav
+    expose:
+      - "3310"
+    ports:
+      - "3310:3310"
+    command: /bin/bash -c "freshclam && clamd --foreground"
+    restart: always
+    volumes:
+      - .:/scanner/docker
